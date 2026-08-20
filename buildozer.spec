@@ -12,7 +12,7 @@ fullscreen = 0
 [android]
 permissions = INTERNET, VIBRATE, POST_NOTIFICATIONS
 android.api = 30
-android.sdk = 30
 android.minapi = 21
 android.ndk = 25b
+android.sdk = 30
 android.arch = arm64-v8a
