@@ -28,19 +28,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Prepare environment
-        run: |
-          sudo mv /usr/local/lib/android/sdk /usr/local/lib/android/sdk_backup || true
-          unset ANDROID_HOME ANDROID_SDK_ROOT ANDROID_NDK_HOME ANDROID_NDK_ROOT ANDROID_NDK ANDROID_NDK_LATEST_HOME || true
-
       - name: Build APK
         run: |
-          printf '[app]\ntitle = FocusPods\npackage.name = focuspods\npackage.domain = org.example\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas,wav,ttf\nversion = 1.0\nrequirements = python3,kivy==2.3.1\norientation = portrait\nfullscreen = 0\n\n[android]\npermissions = INTERNET, VIBRATE, POST_NOTIFICATIONS\nandroid.api = 30\nandroid.minapi = 21\nandroid.ndk = 25b\nandroid.sdk = 30\nandroid.archs = arm64-v8a\np4a.ndk_version = 25b\n' > buildozer.spec
+          # 生成正确的 buildozer.spec（单架构、NDK 25b、API 30，使用单数键 android.arch）
+          printf '[app]\ntitle = FocusPods\npackage.name = focuspods\npackage.domain = org.example\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas,wav,ttf\nversion = 1.0\nrequirements = python3,kivy==2.3.1\norientation = portrait\nfullscreen = 0\n\n[android]\npermissions = INTERNET, VIBRATE, POST_NOTIFICATIONS\nandroid.api = 30\nandroid.minapi = 21\nandroid.ndk = 25b\nandroid.sdk = 30\nandroid.arch = arm64-v8a\n' > buildozer.spec
 
           # 显示生成的 spec 供调试
           cat buildozer.spec
 
-          # 运行 Buildozer
+          # 使用 env -u 强制清除 Android 相关环境变量，避免系统预置 SDK/NDK 干扰
+          env -u ANDROID_HOME -u ANDROID_SDK_ROOT -u ANDROID_NDK_HOME -u ANDROID_NDK_ROOT -u ANDROID_NDK -u ANDROID_NDK_LATEST_HOME \
           yes | buildozer -v android debug
 
       - name: Upload APK artifact
